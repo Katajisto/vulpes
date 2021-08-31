@@ -1,0 +1,19 @@
+{{ define "yield" }}
+<div class="flex items-center justify-center bg-gray-50 h-full">
+    <div class="p-5 bg-gray-300 w-96 rounded shadow">
+        <h1 class="text-2xl mb-4">
+            Kirjaudu sisään
+        </h1>
+        <form action="/login" method="POST">
+            <div class="grid grid-flow-row gap-2 grid-rows-2">
+                <label>Käyttäjänimi</label>
+                <input class="p-1" type="text" />
+                <label>Salasana</label>
+                <input class="p-1" type="password" />
+            </div>
+            <input class="mx-auto block w-full mt-4 text-center p-2 text-lg font-bold bg-yellow-400 text-white"
+                type="submit" value="Kirjaudu">
+        </form>
+    </div>
+</div>
+{{ end }}
