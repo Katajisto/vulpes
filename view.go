@@ -13,6 +13,12 @@ type view struct {
 	Layout   string
 }
 
+var homeView view
+
+func init() {
+	homeView = newView("main", "templates/home.tmpl")
+}
+
 func componentFiles() []string {
 	files, err := filepath.Glob("templates/components/*.tmpl")
 	if err != nil {
