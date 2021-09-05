@@ -1,8 +1,9 @@
 import * as cdk from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda'
-import * as apigateway from '@aws-cdk/aws-apigatewayv2'
-import * as integrations from '@aws-cdk/aws-apigatewayv2-integrations'
-import { memoryUsage } from 'process';
+import * as apigateway from '@aws-cdk/aws-apigateway'
+import * as cf from '@aws-cdk/aws-cloudfront'
+import * as origins from '@aws-cdk/aws-cloudfront-origins'
+
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -16,21 +17,10 @@ export class CdkStack extends cdk.Stack {
       memorySize: 500,
     });
 
-    const api = new apigateway.HttpApi(this, "vulpes-api")
-
-    const vulpesIntegration = new integrations.LambdaProxyIntegration({
-      handler: handler
+    const vulpesApi = new apigateway.LambdaRestApi(this, 'VulpesApi', {
+      handler: handler,
+      proxy: true
     })
-
-    const httpApi = new apigateway.HttpApi(this, 'VulpesHttpApi', {
-      defaultIntegration: vulpesIntegration
-    });
-
-    httpApi.addRoutes({
-      path: '/',
-      methods: [ apigateway.HttpMethod.ANY ],
-      integration: vulpesIntegration,
-    });
 
   }
 }

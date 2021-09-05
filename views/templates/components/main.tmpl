@@ -1,0 +1,17 @@
+{{ define "main"}}
+<!DOCTYPE html>
+<html style="height: 100%">
+  <head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8" />
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body style="height: 100%" class="flex items-stretch flex-col">
+    {{ template "navbar" .}}
+    {{ template "yield" .}}
+  </body>
+</html>
+{{ end }}
