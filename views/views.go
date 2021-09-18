@@ -5,6 +5,7 @@ package views
 
 import (
 	"html/template"
+	"io"
 	"path/filepath"
 )
 
@@ -27,4 +28,8 @@ func NewView(layout string, files ...string) *View {
 		Template: template.Must(template.ParseFiles(files...)),
 		Layout:   layout,
 	}
+}
+
+func (v *View) Render(w io.Writer, data interface{}) error {
+	return v.Template.Execute(w, data)
 }

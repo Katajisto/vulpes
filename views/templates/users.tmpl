@@ -1,0 +1,37 @@
+{{ define "yield" }}
+<div class="flex p-10 flex-col">
+  <div class="mb-10">
+    <h1 class="text-2xl mb-2">Create new user:</h1>
+    <form method="POST" action="/users">
+      <input class="p-2 bg-gray-50" type="text" name="username" placeholder="Username"/>
+      <input class="p-2 bg-gray-50" type="text" name="password" placeholder="Password" />
+      <input class="p-2 mx-4 px-2 rounded cursor-pointer" type="submit">
+    </form>
+  </div>
+  <table class="w-full table-auto">
+    <thead>
+      <tr class="text-left">
+        <th>ID</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .}}
+      <tr class="bg-gray-100 p-2 px-5">
+        <td class="px-2">{{.ID}}</td>
+        <td class="px-2">{{ .Username }}</td>
+        <td>Admin</td>
+        <td class="w-10 flex justify-center p-2">
+          <a class="p-1 px-3 rounded shadow text-white m-1 bg-yellow-500">Edit</a>
+          <form action="/users/{{.ID}}/delete" method="POST" >
+            <input type="submit" class="p-1 px-3 cursor-pointer rounded shadow text-white m-1 bg-red-500" value="Delete">
+          </form>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{ end }}

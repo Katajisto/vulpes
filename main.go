@@ -1,5 +1,9 @@
 package main
 
+import (
+	"vulpes.ktj.st/core"
+)
+
 // Very slim main.go file.
 // We need 2 main.go files. One for lambda and one for dev.
 
@@ -8,5 +12,5 @@ func main() {
 	// Once in startProd and once in startDev.
 	// This way we don't have to change the source code between
 	// lambda and dev deploys.
-	startup()
+	core.Startup()
 }
