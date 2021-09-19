@@ -12,11 +12,10 @@ const hmacSecret = "secrettt"
 
 func registerRoutes(r *mux.Router) {
 	db := models.InitDB()
-
+	userService := models.NewUserService(db)
 	hmac := security.NewHMAC(hmacSecret)
 
-	usersController := controllers.NewUsersController(db, hmac)
-
+	usersController := controllers.NewUsersController(userService, hmac)
 	usersController.RegisterRoutes(r)
 
 }

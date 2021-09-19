@@ -6,7 +6,7 @@ import (
 
 type User struct {
 	gorm.Model
-	Username string
+	Username string `gorm:"uniqueIndex"`
 	Password string
 	Sessions []Session
 }
@@ -18,26 +18,48 @@ type Session struct {
 	Device    string
 }
 
-func AddSession(db *gorm.DB, session *Session) error {
-	return db.Create(session).Error
+type UserService struct {
+	db *gorm.DB
 }
 
-func GetUserByUsername(db *gorm.DB, username string) (*User, error) {
+func NewUserService(db *gorm.DB) *UserService {
+	return &UserService{db: db}
+}
+
+func (us *UserService) AddSession(session *Session) error {
+	return us.db.Create(session).Error
+}
+
+func (us *UserService) GetUserByUsername(username string) (*User, error) {
 	user := &User{}
-	err := db.Where("username = ?", username).First(user).Error
+	err := us.db.Where("username = ?", username).First(user).Error
 	return user, err
 }
 
-func GetAllUsers(db *gorm.DB) ([]User, error) {
+func (us *UserService) GetAllUsers() ([]User, error) {
 	var users []User
-	err := db.Find(&users).Error
+	err := us.db.Find(&users).Error
 	return users, err
 }
 
-func AddUser(db *gorm.DB, user *User) error {
-	return db.Create(user).Error
+func (us *UserService) AddUser(user *User) error {
+	return us.db.Create(user).Error
 }
 
-func DeleteUser(db *gorm.DB, id uint) error {
-	return db.Delete(&User{}, id).Error
+func (us *UserService) DeleteUser(id uint) error {
+	return us.db.Delete(&User{}, id).Error
+}
+
+func (us *UserService) BySession(tokenHash string) (*User, error) {
+	session := &Session{}
+	err := us.db.First(&session, "token_hash = ?", tokenHash).Error
+	if err != nil {
+		return nil, err
+	}
+	user := &User{}
+	err = us.db.First(user, session.UserID).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
