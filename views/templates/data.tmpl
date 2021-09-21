@@ -1,0 +1,20 @@
+{{ define "yield" }}
+    <div class="flex">
+        <div class="bg-green-500 w-1/2 flex items-center text-3xl p-3 px-5 -md shadow-md flex flex-row justify-between m-5 text-white">
+            <h1 class="text-white">Alarm status</h1>
+            <div>
+                <h1 class="text-white">ON</h1>
+            </div>
+        </div>
+        <div class="bg-gray-400 items-center flex w-1/2 text-3xl p-3 px-5 -md shadow-md flex flex-row justify-between m-5 text-white">
+            <h1 class="text-white">Latest update</h1>
+            <h1>2 minutes ago</h1>
+        </div>
+    </div>
+    <div class="shadow bg-gray-100 p-3 px-5 m-5 my-2">
+        <h1 class="text-3xl text-gray-900 mb-4">Temperature data graph</h1>
+        <data-graph></data-graph>
+    </div>
+    
+    
+{{ end }}

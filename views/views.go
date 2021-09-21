@@ -31,5 +31,5 @@ func NewView(layout string, files ...string) *View {
 }
 
 func (v *View) Render(w io.Writer, data interface{}) error {
-	return v.Template.Execute(w, data)
+	return v.Template.ExecuteTemplate(w, v.Layout, data)
 }
