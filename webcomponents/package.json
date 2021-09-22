@@ -34,6 +34,8 @@
     "dist"
   ],
   "dependencies": {
-    "svelte-chartjs": "^1.0.1"
+    "chart.js": "^3.5.1",
+    "fusioncharts": "^3.18.0",
+    "svelte-fusioncharts": "^1.0.0"
   }
 }
