@@ -26,5 +26,8 @@ func Startup() {
 	registerRoutes(r)
 	log.Println("Routes registered")
 	muxLambda = gorillamux.New(r)
+	// Anything we do before this is sometimes kept in memory between lambda execs.
+	// This means, that because we open up our DB before this point here, it will be kept open
+	// between lambda execs. We could also consider doing some in memory caching here.
 	lambda.Start(Handler)
 }

@@ -91,7 +91,11 @@ func (uc *UsersController) AddUser(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Username or password cannot be empty")
 		return
 	}
-	uc.UserService.AddUser(&models.User{Username: username, Password: security.Hash(password)})
+	err := uc.UserService.AddUser(&models.User{Username: username, Password: security.Hash(password)})
+	if err != nil {
+		fmt.Fprintf(w, "Error adding user: ", err)
+		return
+	}
 	http.Redirect(w, r, "/users", http.StatusFound)
 }
 

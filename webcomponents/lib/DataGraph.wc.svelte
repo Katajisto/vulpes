@@ -5,6 +5,7 @@
 <script>
 import { onMount } from "svelte";
 let canvas
+import 'chartjs-adapter-moment';
 
 import {
   Chart,
@@ -59,30 +60,67 @@ Chart.register(
   Tooltip
 );
 
-onMount(()=> {
-    let ctx = canvas.getContext('2d');
-    var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        datasets: [{
-            label: 'Saunan lämpötila',
-            data: [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 40, y: 40}, {x: 50, y: 50}],
-            backgroundColor: [
-                "#707070"
-        ],
-            borderWidth: 5,
-            borderColor: "#707070"
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});})
 
+let tempData
+
+onMount(async ()=> {
+    tempData = {}
+
+    tempData = await fetch('/temperatures').then(res => res.json()).then(data => data)
+
+    let ctx = canvas.getContext('2d');
+
+    console.log(tempData.sensors)
+
+    const colors = ["#FF7A00", "#FF9900", "#FFC700"]
+
+    let datasets = tempData.sensors.map((sensor, index) => {
+        return {
+            borderWidth: 5,
+            borderColor: colors[index],
+            backgroundColor: colors[index],
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4,
+            label: sensor.name,
+            data: sensor.values.map(val => { console.log(val.x); return {x: new Date(val.x), y: val.y}})
+        }
+    })
+
+    let data = {
+        datasets,
+    }
+
+    console.log(data)
+
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: {
+            animation: {
+                duration: 0
+            },
+            elements: {
+                point: {
+                    radius: 0
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        },
+})});
 </script>
 
-<canvas bind:this={canvas} height="70"></canvas>
+<canvas bind:this={canvas} class="chart" height="300px"></canvas>
+
+<style>
+    .chart {
+        height: 300px;
+        max-height: 300px;
+    }
+</style>

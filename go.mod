@@ -14,12 +14,13 @@ require (
 	github.com/fauna/faunadb-go/v4 v4.1.0
 	github.com/gorilla/mux v1.8.0
 	github.com/jmoiron/sqlx v1.3.4
-	github.com/lib/pq v1.2.0
+	github.com/lib/pq v1.10.2
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.9.0
 	github.com/tidwall/pretty v1.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gorm.io/driver/postgres v1.1.1
 	gorm.io/driver/sqlite v1.1.5
 	gorm.io/gorm v1.21.15
 )

@@ -24,5 +24,7 @@ func registerRoutes(r *mux.Router) {
 	auth := middleware.NewRequreUserMw(usersController.UserService)
 
 	r.HandleFunc("/", auth.ApplyFn(dataController.Get))
-
+	r.HandleFunc("/temperatures", dataController.PostJSONData).Methods("POST")
+	r.HandleFunc("/temperatures", auth.ApplyFn(dataController.GetJSONTemps)).Methods("GET")
+	r.HandleFunc("/toggleAlarm", auth.ApplyFn(dataController.ToggleArmed)).Methods("POST")
 }

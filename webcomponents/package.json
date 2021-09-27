@@ -10,7 +10,7 @@
     "library"
   ],
   "scripts": {
-    "build": "rollup -c && rm ../static/webcomponents/bundle.js && cp ./dist/index.js ../static/webcomponents/bundle.js",
+    "build": "rollup -c && rm ../s3/static/webcomponents/bundle.js && cp ./dist/index.js ../s3/static/webcomponents/bundle.js",
     "build:demo": "rollup -c rollup.demo.config.js",
     "dev": "rollup -c rollup.demo.config.js -w",
     "start": "sirv demo/public",
@@ -35,7 +35,9 @@
   ],
   "dependencies": {
     "chart.js": "^3.5.1",
+    "chartjs-adapter-moment": "^1.0.0",
     "fusioncharts": "^3.18.0",
+    "moment": "^2.29.1",
     "svelte-fusioncharts": "^1.0.0"
   }
 }
