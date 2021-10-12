@@ -8,6 +8,7 @@ func InitDB() *gorm.DB {
 	// Migrate models
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Session{})
+	db.AutoMigrate(&TgNotifyTarget{})
 	MigrateData(db)
 	return db
 }

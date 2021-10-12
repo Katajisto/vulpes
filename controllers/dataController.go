@@ -8,6 +8,8 @@ import (
 	"github.com/gorilla/mux"
 	"vulpes.ktj.st/models"
 	"vulpes.ktj.st/views"
+	"github.com/andanhm/go-prettytime"
+
 )
 
 type DataController struct {
@@ -27,7 +29,28 @@ func (c *DataController) Get(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	err = c.DataView.Render(w, status)
+
+	lastData, err := c.DataService.GetLatestData()
+
+	if err != nil {
+		return
+	}
+
+	type RenderData struct {
+		Status models.Status
+		LastData models.DataPoint
+		LastUpdatePretty string
+	}
+
+	prettyLastUpdate := prettytime.Format(lastData.CreatedAt)
+
+	renderData := RenderData{
+		Status: status,
+		LastData: lastData,
+		LastUpdatePretty: prettyLastUpdate,
+	}
+
+	err = c.DataView.Render(w, renderData)
 	if err != nil {
 		log.Println(err)
 	}

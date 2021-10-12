@@ -1,0 +1,27 @@
+{{ define "yield"}}
+<div class="m-10">
+    <div class="flex items-center mb-4">
+        <h1 class="text-2xl">Hälytettävät telegram chatit</h1>
+        <form method="POST" action="/telegram/test">
+            <input type="submit" value="Testaa hälytystä" class="bg-yellow-500 p-2 text-white rounded shadow ml-4" />
+        </form>
+    </div>
+    {{ range . }}
+    <div class="p-3 my-5 flex justify-between items-center rounded shadow bg-white">
+        <div>
+            <h2 class="text-xl font-semibold">{{.Name}}</h2>
+            <h3 class="text-lg">{{.ChatID}}</h3>
+        </div>
+        {{ template "delButton" printf "telegram/%v/delete" .ID }}
+    </div>
+    {{ end }}
+    <div class="p-3 rounded shadow bg-white mt-5">
+        <h2 class="m-2 text-xl">Lisää telegram chatti</h2>
+        <form action="/telegram/add" class="mb-2 flex flex-col" method="POST">
+            <input class="p-2 bg-gray-100 m-2 rounded" type="text" placeholder="Nimi" name="name" />
+            <input class="p-2 bg-gray-100 m-2 rounded" type="text" placeholder="ChatID" name="chat" />
+            <input type="submit" class="p-2 rounded mx-2 my-3 shadow bg-yellow-500 text-white" value="Lähetä" />
+        </form>
+    </div>
+</div>
+{{ end }}

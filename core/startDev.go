@@ -14,7 +14,7 @@ func Startup() {
 	registerRoutes(r)
 
 	// Serve static assets from the static directory. In production serve these from S3 through API Gateway.
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("s3/static"))))
 
 	// Bind the router to a port
 	http.ListenAndServe(":8080", r)

@@ -15,10 +15,12 @@ func registerRoutes(r *mux.Router) {
 	db := models.InitDB()
 	userService := models.NewUserService(db)
 	dataService := models.NewDataService(db)
+	alarmsService := models.NewAlarmsService(db)
 	hmac := security.NewHMAC(hmacSecret)
 
 	usersController := controllers.NewUsersController(userService, hmac)
 	dataController := controllers.NewDataController(dataService)
+	alarmsController := controllers.NewAlarmsController(alarmsService)
 	usersController.RegisterRoutes(r)
 
 	auth := middleware.NewRequreUserMw(usersController.UserService)
@@ -27,4 +29,8 @@ func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/temperatures", dataController.PostJSONData).Methods("POST")
 	r.HandleFunc("/temperatures", auth.ApplyFn(dataController.GetJSONTemps)).Methods("GET")
 	r.HandleFunc("/toggleAlarm", auth.ApplyFn(dataController.ToggleArmed)).Methods("POST")
+	r.HandleFunc("/telegram", auth.ApplyFn(alarmsController.TelegramOverview)).Methods("GET")
+	r.HandleFunc("/telegram/add", auth.ApplyFn(alarmsController.TelegramAdd)).Methods("POST")
+	r.HandleFunc("/telegram/{id}/delete", auth.ApplyFn(alarmsController.TelegramDel)).Methods("POST")
+	r.HandleFunc("/telegram/test", auth.ApplyFn(alarmsController.AlarmTest)).Methods("POST")
 }

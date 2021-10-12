@@ -2,6 +2,7 @@ package models
 
 import (
 	"time"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -49,9 +50,18 @@ func (d *DataService) SetStatus(armed bool) error {
 	return d.db.Save(&status).Error
 }
 
+// Gets 200 latest datapoints, in order to not overwork the frontend.
 func (d *DataService) GetAllData() ([]DataPoint, error) {
+	// Get amount of data points in db so we can skip most.
+	var amount int64
+	d.db.Model(&DataPoint{}).Count(&amount)
+	log.Println("Found ", amount, " datapoints in db.")
+
+	amount -= 200;
+	if amount < 0 { amount = 0 }
+
 	var data []DataPoint
-	err := d.db.Preload("TemperatureData").Find(&data).Error
+	err := d.db.Preload("TemperatureData").Offset(int(amount)).Limit(200).Find(&data).Error
 	return data, err
 }
 

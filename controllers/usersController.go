@@ -80,7 +80,7 @@ func (uc *UsersController) LoginPost(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &cookie)
 
-	http.Redirect(w, r, "/users", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 // Handles new user add POST requests.
