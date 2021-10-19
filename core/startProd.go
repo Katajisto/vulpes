@@ -21,13 +21,12 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 // StartProd starts the API Gateway proxy in production mode.
 func Startup() {
 	// Create a new router
-	log.Println("[ Lambdalith ] Lambda Mux Cold Start")
 	r := mux.NewRouter()
 	registerRoutes(r)
-	log.Println("Routes registered")
-	muxLambda = gorillamux.New(r)
-	// Anything we do before this is sometimes kept in memory between lambda execs.
-	// This means, that because we open up our DB before this point here, it will be kept open
-	// between lambda execs. We could also consider doing some in memory caching here.
-	lambda.Start(Handler)
+
+	// Serve static assets from the static directory. In production serve these from S3 through API Gateway.
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("s3/static"))))
+
+	// Bind the router to a port
+	http.ListenAndServe(":1337", r)
 }
