@@ -3,20 +3,10 @@
 package core
 
 import (
-	"context"
-	"log"
+	"net/http"
 
-	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/awslabs/aws-lambda-go-api-proxy/gorillamux"
 	"github.com/gorilla/mux"
 )
-
-var muxLambda *gorillamux.GorillaMuxAdapter
-
-func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	return muxLambda.ProxyWithContext(ctx, req)
-}
 
 // StartProd starts the API Gateway proxy in production mode.
 func Startup() {
