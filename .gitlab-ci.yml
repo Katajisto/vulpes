@@ -1,38 +1,33 @@
 
 image: golang:latest
 
-variables:
-  # Please edit to your GitLab project
-  REPO_NAME: gitlab.com/namespace/project
-
-# The problem is that to be able to use go get, one needs to put
-# the repository in the $GOPATH. So for example if your gitlab domain
-# is gitlab.com, and that your repository is namespace/project, and
-# the default GOPATH being /go, then you'd need to have your
-# repository in /go/src/gitlab.com/namespace/project
-# Thus, making a symbolic link corrects this.
-before_script:
-  - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
-  - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
-  - cd $GOPATH/src/$REPO_NAME
-
 stages:
-  - test
   - build
-  - deploy
 
-format:
-  stage: test
-  script:
-    - go fmt $(go list ./... | grep -v /vendor/)
-    - go vet $(go list ./... | grep -v /vendor/)
-    - go test -race $(go list ./... | grep -v /vendor/)
 
-compile:
+docker-build:
+  # Use the official docker image.
+  image: docker:latest
   stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  # Default branch leaves tag empty (= latest tag)
+  # All other branches are tagged with the escaped branch name (commit ref slug)
   script:
-    - go build -race -ldflags "-extldflags '-static'" -o $CI_PROJECT_DIR/mybinary
-  artifacts:
-    paths:
-      - mybinary
-
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag=":$CI_COMMIT_REF_SLUG"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE${tag}"
+  # Run this job in a branch where a Dockerfile exists
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - Dockerfile
