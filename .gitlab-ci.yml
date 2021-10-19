@@ -1,11 +1,4 @@
-
-image: golang:latest
-
-stages:
-  - build
-
-
-docker-build:
+dockerbuild1:
   # Use the official docker image.
   image: docker:latest
   stage: build
