@@ -6,4 +6,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -tags prod -o main
 FROM alpine:latest  
 WORKDIR /root/
 COPY --from=0 /app/main ./
+COPY --from=0 /app/views/templates ./templates
+COPY --from=0 /app/s3 ./s3
 CMD ["./main"]
