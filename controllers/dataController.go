@@ -79,12 +79,13 @@ func (c *DataController) PostJSONData(w http.ResponseWriter, r *http.Request) {
 	var data PostData
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		panic(err)
+		return
 	}
 	c.DataService.AddData(data.Temperatures)
 
 	w.WriteHeader(http.StatusOK)
 }
+
 
 func (c *DataController) GetJSONTemps(w http.ResponseWriter, r *http.Request) {
 	// For development purposes of webcomponents.

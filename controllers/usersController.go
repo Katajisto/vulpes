@@ -87,15 +87,18 @@ func (uc *UsersController) LoginPost(w http.ResponseWriter, r *http.Request) {
 func (uc *UsersController) AddUser(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
+
 	if username == "" || password == "" {
 		fmt.Fprintf(w, "Username or password cannot be empty")
 		return
 	}
+
 	err := uc.UserService.AddUser(&models.User{Username: username, Password: security.Hash(password)})
 	if err != nil {
 		fmt.Fprintf(w, "Error adding user: ", err)
 		return
 	}
+	
 	http.Redirect(w, r, "/users", http.StatusFound)
 }
 

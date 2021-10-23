@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,14 +17,16 @@ import (
 type AlarmsController struct {
 	AlarmsView      *views.View
 	AlarmsService   *models.AlarmsService
+	DataService     *models.DataService
 	TelegramService *telegram.TelegramService
 }
 
-func NewAlarmsController(as *models.AlarmsService) *AlarmsController {
+func NewAlarmsController(as *models.AlarmsService, ds *models.DataService) *AlarmsController {
 	return &AlarmsController{
 		AlarmsView:      views.NewView("main", "views/templates/telegram.tmpl"),
 		AlarmsService:   as,
 		TelegramService: telegram.NewTelegramService(),
+		DataService:     ds,
 	}
 }
 
@@ -65,9 +68,43 @@ func (as *AlarmsController) TelegramAdd(w http.ResponseWriter, r *http.Request) 
 
 func (ac *AlarmsController) AlarmTest(w http.ResponseWriter, r *http.Request) {
 	log.Println("ALARM TEST")
+	ac.SendAlarm("Hälytyksen testiviesti!")
+	http.Redirect(w, r, "/telegram", http.StatusFound)
+}
+
+func (ac *AlarmsController) SendAlarm(alarm string) {
 	targets := ac.AlarmsService.GetTgTargets()
 	for _, target := range targets {
-		go ac.TelegramService.SendMessage(target.ChatID, "Hälytyksen testiviesti!")
+		go ac.TelegramService.SendMessage(target.ChatID, alarm)
 	}
-	http.Redirect(w, r, "/telegram", http.StatusFound)
+}
+
+// Struct that represents incoming JSON event data.
+type event struct {
+	EventType string      `json:"eventType"`
+	EventData interface{} `json:"eventData"`
+}
+
+// Handle json event post.
+func (ac *AlarmsController) PostEventData(w http.ResponseWriter, r *http.Request) {
+	var data event
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		return
+	}
+
+	curStatus, err := ac.DataService.GetStatus()
+	if err != nil {
+		log.Println(err)
+	}
+
+	isArmed := curStatus.Armed
+
+	// Handle different types of events.
+	switch data.EventType {
+	case "DoorOpen":
+		if isArmed {
+			ac.SendAlarm("HÄLYTYS: Ovi avattiin!")
+		}
+	}
 }
