@@ -20,7 +20,7 @@ func registerRoutes(r *mux.Router) {
 
 	usersController := controllers.NewUsersController(userService, hmac)
 	dataController := controllers.NewDataController(dataService)
-	alarmsController := controllers.NewAlarmsController(alarmsService)
+	alarmsController := controllers.NewAlarmsController(alarmsService, dataService)
 	usersController.RegisterRoutes(r)
 
 	auth := middleware.NewRequreUserMw(usersController.UserService)
@@ -33,4 +33,5 @@ func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/telegram/add", auth.ApplyFn(alarmsController.TelegramAdd)).Methods("POST")
 	r.HandleFunc("/telegram/{id}/delete", auth.ApplyFn(alarmsController.TelegramDel)).Methods("POST")
 	r.HandleFunc("/telegram/test", auth.ApplyFn(alarmsController.AlarmTest)).Methods("POST")
+	r.HandleFunc("/postEvent", alarmsController.PostEventData).Methods("POST")
 }

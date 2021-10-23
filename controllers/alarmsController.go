@@ -68,6 +68,7 @@ func (as *AlarmsController) TelegramAdd(w http.ResponseWriter, r *http.Request) 
 
 func (ac *AlarmsController) AlarmTest(w http.ResponseWriter, r *http.Request) {
 	log.Println("ALARM TEST")
+	log.Println(ac.TelegramService)
 	ac.SendAlarm("Hälytyksen testiviesti!")
 	http.Redirect(w, r, "/telegram", http.StatusFound)
 }
@@ -75,7 +76,7 @@ func (ac *AlarmsController) AlarmTest(w http.ResponseWriter, r *http.Request) {
 func (ac *AlarmsController) SendAlarm(alarm string) {
 	targets := ac.AlarmsService.GetTgTargets()
 	for _, target := range targets {
-		go ac.TelegramService.SendMessage(target.ChatID, alarm)
+		ac.TelegramService.SendMessage(target.ChatID, alarm)
 	}
 }
 
