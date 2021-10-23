@@ -14,6 +14,7 @@ require (
 	github.com/cjbassi/gotop v0.0.0-20200829004927-65d76af83079 // indirect
 	github.com/fauna/faunadb-go/v4 v4.1.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
+	github.com/google/logger v1.1.1
 	github.com/gorilla/mux v1.8.0
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/lib/pq v1.10.2

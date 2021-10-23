@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func CreateTestUserService() (*UserService, error) {
@@ -14,7 +15,10 @@ func CreateTestUserService() (*UserService, error) {
 	if err != nil {
 		log.Println(err)
 	}
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{
+	  Logger: logger.Default.LogMode(logger.Silent),
+	})
+
 
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Session{})

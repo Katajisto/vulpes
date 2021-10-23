@@ -1,8 +1,8 @@
 package models
 
 import (
-	"time"
 	"log"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -45,7 +45,6 @@ func (d *DataService) SetStatus(armed bool) error {
 	if err != nil {
 		return err
 	}
-
 	status.Armed = armed
 	return d.db.Save(&status).Error
 }
@@ -59,7 +58,6 @@ func (d *DataService) GetAllData() ([]DataPoint, error) {
 
 	amount -= 200;
 	if amount < 0 { amount = 0 }
-
 	var data []DataPoint
 	err := d.db.Preload("TemperatureData").Offset(int(amount)).Limit(200).Find(&data).Error
 	return data, err
