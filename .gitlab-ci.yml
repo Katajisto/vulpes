@@ -28,7 +28,6 @@ docker-build:
       fi
     - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
     - docker push "$CI_REGISTRY_IMAGE${tag}"
-    - curl -X POST https://portainer.0x2a.fi:9443/api/webhooks/1aa22d52-d4f2-4e95-a44f-bdc5e2632465
   # Run this job in a branch where a Dockerfile exists
   rules:
     - if: $CI_COMMIT_BRANCH
