@@ -91,12 +91,14 @@ func (ac *AlarmsController) PostEventData(w http.ResponseWriter, r *http.Request
 	var data event
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
+		fmt.Fprintf(w, "%v", err)
 		return
 	}
 
 	curStatus, err := ac.DataService.GetStatus()
 	if err != nil {
-		log.Println(err)
+		fmt.Fprintf(w, "%v", err)
+		return
 	}
 
 	isArmed := curStatus.Armed
