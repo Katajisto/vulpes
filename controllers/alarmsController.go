@@ -103,11 +103,14 @@ func (ac *AlarmsController) PostEventData(w http.ResponseWriter, r *http.Request
 
 	isArmed := curStatus.Armed
 
+	log.Println("EVENT TYPE: ", data.EventData)
+
 	// Handle different types of events.
 	switch data.EventType {
 	case "DoorOpen":
 		if isArmed {
 			ac.SendAlarm("HÄLYTYS: Ovi avattiin!")
+			log.Println("Alarm sent.")
 		}
 	}
 }
