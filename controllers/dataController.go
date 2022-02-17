@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/andanhm/go-prettytime"
 	"github.com/gorilla/mux"
 	"vulpes.ktj.st/models"
 	"vulpes.ktj.st/views"
-	"github.com/andanhm/go-prettytime"
-
 )
 
 type DataController struct {
@@ -37,16 +37,16 @@ func (c *DataController) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type RenderData struct {
-		Status models.Status
-		LastData models.DataPoint
+		Status           models.Status
+		LastData         models.DataPoint
 		LastUpdatePretty string
 	}
 
 	prettyLastUpdate := prettytime.Format(lastData.CreatedAt)
 
 	renderData := RenderData{
-		Status: status,
-		LastData: lastData,
+		Status:           status,
+		LastData:         lastData,
 		LastUpdatePretty: prettyLastUpdate,
 	}
 
@@ -81,11 +81,32 @@ func (c *DataController) PostJSONData(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	c.DataService.AddData(data.Temperatures)
 
+	// Get latest data we have.
+	latest, err := c.DataService.GetLatestData()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// TODO: Implement data cleanup.
+	// If we have a record at most an hour old. We discard the new data.
+	limit := time.Now().Add(-30 * time.Minute)
+
+	if !latest.Model.CreatedAt.Before(limit) {
+		w.WriteHeader(http.StatusOK)
+		// TODO: Remove this later
+		log.Println("Discarded data.")
+		return
+	}
+
+	err = c.DataService.AddData(data.Temperatures)
+	if err != nil {
+		// We dont care about the error in our sensor data sender
+		// so we just log it.
+		log.Println("Data adding failed: ", err)
+	}
 	w.WriteHeader(http.StatusOK)
 }
-
 
 func (c *DataController) GetJSONTemps(w http.ResponseWriter, r *http.Request) {
 	// For development purposes of webcomponents.
