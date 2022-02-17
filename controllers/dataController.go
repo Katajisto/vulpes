@@ -2,25 +2,26 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/andanhm/go-prettytime"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/andanhm/go-prettytime"
-	"github.com/gorilla/mux"
 	"vulpes.ktj.st/models"
 	"vulpes.ktj.st/views"
 )
 
 type DataController struct {
-	DataView    *views.View
-	DataService *models.DataService
+	DataView         *views.View
+	DataService      *models.DataService
+	AlarmsController *AlarmsController
 }
 
-func NewDataController(ds *models.DataService) *DataController {
+func NewDataController(ds *models.DataService, ac *AlarmsController) *DataController {
 	return &DataController{
-		DataView:    views.NewView("main", "views/templates/data.tmpl"),
-		DataService: ds,
+		DataView:         views.NewView("main", "views/templates/data.tmpl"),
+		DataService:      ds,
+		AlarmsController: ac,
 	}
 }
 
@@ -90,7 +91,15 @@ func (c *DataController) PostJSONData(w http.ResponseWriter, r *http.Request) {
 	}
 	// TODO: Implement data cleanup.
 	// If we have a record at most an hour old. We discard the new data.
-	limit := time.Now().Add(-30 * time.Minute)
+	limit := time.Now().Add(-6 * time.Hour)
+
+	// Even though we reject data from datapoint, we must check if temperature is too low.
+	// TODO: IMPLEMENT SOMETHING NICER FOR THIS!
+	for _, temp := range data.Temperatures {
+		if temp.Value < 14 {
+			c.AlarmsController.SendAlarm("LÄMPÖTILA ALLE 14C!")
+		}
+	}
 
 	if !latest.Model.CreatedAt.Before(limit) {
 		w.WriteHeader(http.StatusOK)

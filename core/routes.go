@@ -19,8 +19,10 @@ func registerRoutes(r *mux.Router) {
 	hmac := security.NewHMAC(hmacSecret)
 
 	usersController := controllers.NewUsersController(userService, hmac)
-	dataController := controllers.NewDataController(dataService)
 	alarmsController := controllers.NewAlarmsController(alarmsService, dataService)
+	// This is not optimal, but we need functions from the alarms controller to send the alert if data has problem.
+	dataController := controllers.NewDataController(dataService, alarmsController)
+
 	usersController.RegisterRoutes(r)
 
 	auth := middleware.NewRequreUserMw(usersController.UserService)
