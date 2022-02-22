@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/andanhm/go-prettytime"
+	"github.com/gorilla/mux"
 	"vulpes.ktj.st/models"
 	"vulpes.ktj.st/views"
 )
@@ -93,12 +95,10 @@ func (c *DataController) PostJSONData(w http.ResponseWriter, r *http.Request) {
 	limit := time.Now().Add(-6 * time.Hour)
 	alarmLimit := time.Now().Add(-1 * time.Hour)
 
-	// Even though we reject data from datapoint, we must check if temperature is too low.
-	// TODO: IMPLEMENT SOMETHING NICER FOR THIS!
-	if !latest.Model.CreatedAt.Before(limit) {
+	if !latest.Model.CreatedAt.Before(alarmLimit) {
 		for _, temp := range data.Temperatures {
 			if temp.Value < 12 {
-				c.AlarmsController.SendAlarm("LÄMPÖTILA ALLE 14C!")
+				c.AlarmsController.SendAlarm("LÄMPÖTILA ALLE 12C!")
 			}
 		}
 	}
