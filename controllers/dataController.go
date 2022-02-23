@@ -95,15 +95,19 @@ func (c *DataController) PostJSONData(w http.ResponseWriter, r *http.Request) {
 	limit := time.Now().Add(-6 * time.Hour)
 	alarmLimit := time.Now().Add(-1 * time.Hour)
 
+	didAlarm := false
+
 	if !latest.Model.CreatedAt.Before(alarmLimit) {
 		for _, temp := range data.Temperatures {
 			if temp.Value < 12 {
 				c.AlarmsController.SendAlarm("LÄMPÖTILA ALLE 12C!")
+				didAlarm = true
 			}
 		}
 	}
 
-	if !latest.Model.CreatedAt.Before(limit) {
+	// Dont discard data if there was alert.
+	if !didAlarm && !latest.Model.CreatedAt.Before(limit) {
 		w.WriteHeader(http.StatusOK)
 		// TODO: Remove this later
 		log.Println("Discarded data.")
