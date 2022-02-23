@@ -82,7 +82,7 @@ onMount(async ()=> {
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
             label: sensor.name,
-            data: sensor.values.map(val => { console.log(val.x); return {x: new Date(val.x), y: val.y}})
+            data: sensor.values.map(val => { console.log(val.x); return {x: new Date(val.x), y: val.y}}).sort((a,b) => a.x - b.x)
         }
     })
 
