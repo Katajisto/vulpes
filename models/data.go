@@ -61,7 +61,7 @@ func (d *DataService) GetAllData() ([]DataPoint, error) {
 		amount = 0
 	}
 	var data []DataPoint
-	err := d.db.Preload("TemperatureData").Offset(int(amount)).Find(&data).Error
+	err := d.db.Preload("TemperatureData").Find(&data).Error
 	return data, err
 }
 
