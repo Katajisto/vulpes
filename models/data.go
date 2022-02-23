@@ -56,10 +56,12 @@ func (d *DataService) GetAllData() ([]DataPoint, error) {
 	d.db.Model(&DataPoint{}).Count(&amount)
 	log.Println("Found ", amount, " datapoints in db.")
 
-	amount -= 200;
-	if amount < 0 { amount = 0 }
+	amount -= 200
+	if amount < 0 {
+		amount = 0
+	}
 	var data []DataPoint
-	err := d.db.Preload("TemperatureData").Offset(int(amount)).Limit(200).Find(&data).Error
+	err := d.db.Preload("TemperatureData").Offset(int(amount)).Find(&data).Error
 	return data, err
 }
 

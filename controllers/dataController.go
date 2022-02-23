@@ -97,11 +97,12 @@ func (c *DataController) PostJSONData(w http.ResponseWriter, r *http.Request) {
 
 	didAlarm := false
 
-	if !latest.Model.CreatedAt.Before(alarmLimit) {
+	if latest.Model.CreatedAt.Before(alarmLimit) {
 		for _, temp := range data.Temperatures {
 			if temp.Value < 12 {
 				c.AlarmsController.SendAlarm("LÄMPÖTILA ALLE 12C!")
 				didAlarm = true
+				break
 			}
 		}
 	}
