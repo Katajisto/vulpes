@@ -93,7 +93,7 @@ func (c *DataController) PostJSONData(w http.ResponseWriter, r *http.Request) {
 	// TODO: Implement data cleanup.
 	// If we have a record at most an hour old. We discard the new data.
 	limit := time.Now().Add(-6 * time.Hour)
-	alarmLimit := time.Now().Add(-1 * time.Hour)
+	alarmLimit := time.Now().Add(-20 * time.Minute)
 
 	didAlarm := false
 
