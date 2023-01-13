@@ -1,16 +1,18 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
 	"vulpes.ktj.st/core"
 )
 
-// Very slim main.go file.
-// We need 2 main.go files. One for lambda and one for dev.
-
 func main() {
-	// This function is defined 2 times.
-	// Once in startProd and once in startDev.
-	// This way we don't have to change the source code between
-	// lambda and dev deploys.
-	core.Startup()
+	// Create a new router
+	r := mux.NewRouter()
+	core.RegisterRoutes(r)
+
+	// Bind the router to a port
+	err := http.ListenAndServe(":1337", r)
+	log.Println("Exited due to error: ", err)
 }

@@ -16,7 +16,7 @@ type Temperature struct {
 
 type DataPoint struct {
 	gorm.Model
-	Timestamp       string        `json:"timestamp"`
+	Timestamp       time.Time     `json:"timestamp"`
 	TemperatureData []Temperature `json:"temperatureData"`
 }
 
@@ -67,7 +67,7 @@ func (d *DataService) GetAllData() ([]DataPoint, error) {
 
 func (d *DataService) AddData(tempData []Temperature) error {
 	data := DataPoint{
-		Timestamp:       time.Now().Format(time.RFC3339),
+		Timestamp:       time.Now(),
 		TemperatureData: tempData,
 	}
 
