@@ -7,6 +7,5 @@ FROM alpine:latest
 WORKDIR /root/
 COPY --from=0 /app/main ./
 COPY --from=0 /app/views/templates ./views/templates
-COPY --from=0 /app/s3 ./s3
 CMD ["./main"]
 EXPOSE 1337
