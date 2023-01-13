@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/gorilla/mux"
+	"log"
 	"vulpes.ktj.st/controllers"
 	"vulpes.ktj.st/core/middleware"
 	"vulpes.ktj.st/core/security"
@@ -18,15 +19,19 @@ func registerRoutes(r *mux.Router) {
 	alarmsService := models.NewAlarmsService(db)
 	hmac := security.NewHMAC(hmacSecret)
 
+	log.Println("Hello")
+
 	usersController := controllers.NewUsersController(userService, hmac)
 	alarmsController := controllers.NewAlarmsController(alarmsService, dataService)
 	// This is not optimal, but we need functions from the alarms controller to send the alert if data has problem.
 	dataController := controllers.NewDataController(dataService, alarmsController)
 
+	log.Println("Hello")
 	usersController.RegisterRoutes(r)
 
 	auth := middleware.NewRequreUserMw(usersController.UserService)
 
+	log.Println("Hello")
 	r.HandleFunc("/", auth.ApplyFn(dataController.Get))
 	r.HandleFunc("/temperatures", dataController.PostJSONData).Methods("POST")
 	r.HandleFunc("/temperatures", auth.ApplyFn(dataController.GetJSONTemps)).Methods("GET")
