@@ -2,12 +2,14 @@ package controllers
 
 import (
 	"encoding/json"
+	"html/template"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/andanhm/go-prettytime"
 	"github.com/gorilla/mux"
+	"vulpes.ktj.st/graph"
 	"vulpes.ktj.st/models"
 	"vulpes.ktj.st/views"
 )
@@ -34,14 +36,11 @@ func (c *DataController) Get(w http.ResponseWriter, r *http.Request) {
 
 	lastData, err := c.DataService.GetLatestData()
 
-	if err != nil {
-		return
-	}
-
 	type RenderData struct {
 		Status           models.Status
 		LastData         models.DataPoint
 		LastUpdatePretty string
+		PlotDataUri      template.URL
 	}
 
 	prettyLastUpdate := prettytime.Format(lastData.CreatedAt)
@@ -50,6 +49,7 @@ func (c *DataController) Get(w http.ResponseWriter, r *http.Request) {
 		Status:           status,
 		LastData:         lastData,
 		LastUpdatePretty: prettyLastUpdate,
+		PlotDataUri:      graph.GetTemperaturePlotImageDataUrl(c.DataService.GetAllData()),
 	}
 
 	err = c.DataView.Render(w, renderData)
@@ -87,32 +87,29 @@ func (c *DataController) PostJSONData(w http.ResponseWriter, r *http.Request) {
 	// Get latest data we have.
 	latest, err := c.DataService.GetLatestData()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	// TODO: Implement data cleanup.
-	// If we have a record at most an hour old. We discard the new data.
-	limit := time.Now().Add(-6 * time.Hour)
-	alarmLimit := time.Now().Add(-20 * time.Minute)
+		// If we have a record at most an hour old. We discard the new data.
+		limit := time.Now().Add(-6 * time.Hour)
+		alarmLimit := time.Now().Add(-20 * time.Minute)
 
-	didAlarm := false
+		didAlarm := false
 
-	if latest.Model.CreatedAt.Before(alarmLimit) {
-		for _, temp := range data.Temperatures {
-			if temp.Value < 12 {
-				c.AlarmsController.SendAlarm("LÄMPÖTILA ALLE 12C!")
-				didAlarm = true
-				break
+		if latest.Model.CreatedAt.Before(alarmLimit) {
+			for _, temp := range data.Temperatures {
+				if temp.Value < 12 {
+					c.AlarmsController.SendAlarm("LÄMPÖTILA ALLE 12C!")
+					didAlarm = true
+					break
+				}
 			}
 		}
-	}
 
-	// Dont discard data if there was alert.
-	if !didAlarm && !latest.Model.CreatedAt.Before(limit) {
-		w.WriteHeader(http.StatusOK)
-		// TODO: Remove this later
-		log.Println("Discarded data.")
-		return
+		// Dont discard data if there was alert.
+		if !didAlarm && !latest.Model.CreatedAt.Before(limit) {
+			w.WriteHeader(http.StatusOK)
+			// TODO: Remove this later
+			log.Println("Discarded data.")
+			return
+		}
 	}
 
 	err = c.DataService.AddData(data.Temperatures)
@@ -122,55 +119,6 @@ func (c *DataController) PostJSONData(w http.ResponseWriter, r *http.Request) {
 		log.Println("Data adding failed: ", err)
 	}
 	w.WriteHeader(http.StatusOK)
-}
-
-func (c *DataController) GetJSONTemps(w http.ResponseWriter, r *http.Request) {
-	// For development purposes of webcomponents.
-	w.Header().Add("Access-Control-Allow-Origin", "http://localhost:5000")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	// Some quite ugly logic so we don't have to write this on front-end.
-	// TODO: Think about refactoring this.
-	type Value struct {
-		X string  `json:"x"`
-		Y float64 `json:"y"`
-	}
-
-	type SensorData struct {
-		Name   string  `json:"name"`
-		Values []Value `json:"values"`
-	}
-
-	type SensorsData struct {
-		Times   []string     `json:"times"`
-		Sensors []SensorData `json:"sensors"`
-	}
-
-	temps, err := c.DataService.GetAllData()
-	if err != nil {
-		panic(err)
-	}
-
-	allSensors := SensorsData{}
-
-	sensorMap := make(map[string][]Value)
-
-	for _, point := range temps {
-		allSensors.Times = append(allSensors.Times, point.Timestamp)
-		for _, sensor := range point.TemperatureData {
-			sensorMap[sensor.Sensor] = append(sensorMap[sensor.Sensor], Value{X: point.Timestamp, Y: sensor.Value})
-		}
-	}
-
-	for k, v := range sensorMap {
-		allSensors.Sensors = append(allSensors.Sensors, SensorData{Name: k, Values: v})
-	}
-
-	json.NewEncoder(w).Encode(allSensors)
 }
 
 func (c *DataController) RegisterRoutes(r *mux.Router) {

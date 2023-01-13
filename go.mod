@@ -7,9 +7,8 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/gorilla/mux v1.8.0
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
-	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
-	gorm.io/driver/postgres v1.1.1
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	gonum.org/v1/plot v0.12.0
 	gorm.io/driver/sqlite v1.1.5
 	gorm.io/gorm v1.21.15
 )
