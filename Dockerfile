@@ -1,4 +1,4 @@
-FROM golang:alpine
+FROM golang:bullseye
 COPY . /app
 WORKDIR /app
 
