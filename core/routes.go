@@ -28,7 +28,7 @@ func RegisterRoutes(r *mux.Router) {
 		log.Println("No user found, creating default user")
 		var defaultUser models.User
 		defaultUser.Username = "admin"
-		defaultUser.Password = "$2a$12$mk0Bac09PY8GJipBWBJkcOqveRA1P5gLox3VpRSbKi4E/T0N2k5ra"
+		defaultUser.Password = "$2a$12$WMAnXgqBXoqY2InaIGWSPu/Ohe0l2sa7fOi4tVCR5JSwTtn27cdSK" // just admin
 		userService.AddUser(&defaultUser)
 	}
 
